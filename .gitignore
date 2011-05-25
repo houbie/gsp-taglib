@@ -4,3 +4,5 @@ target
 .idea
 out
 *.db
+*.zip
+plugin.xml
