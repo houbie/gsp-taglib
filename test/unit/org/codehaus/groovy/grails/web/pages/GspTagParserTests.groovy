@@ -13,6 +13,7 @@ class GspTagParserTests extends GroovyTestCase {
         println parseResult
 
         assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
 
 import org.codehaus.groovy.grails.web.taglib.*
 
@@ -36,6 +37,7 @@ out.print('<p>static content</p>')
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
         assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
 
 import java.lang.System
 import java.lang.String
@@ -69,6 +71,7 @@ ${bean}
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
         assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
 
 import org.codehaus.groovy.grails.web.taglib.*
 
@@ -105,6 +108,7 @@ out.print('</div>\\n')
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
         assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
 
 import org.codehaus.groovy.grails.web.taglib.*
 
@@ -132,6 +136,7 @@ out.print('\\n</p>\\n')
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
         assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
 
 import org.codehaus.groovy.grails.web.taglib.*
 
@@ -158,6 +163,7 @@ out.print('</div>\\n')
         String parseResult = parser.parse().text
         println parseResult
         assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
 
 import org.codehaus.groovy.grails.web.taglib.*
 

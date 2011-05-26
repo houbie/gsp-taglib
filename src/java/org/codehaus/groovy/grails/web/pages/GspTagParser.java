@@ -109,7 +109,7 @@ public class GspTagParser extends GroovyPageParser {
     public static final String[] DEFAULT_IMPORTS = {
             "org.codehaus.groovy.grails.web.taglib.*"
     };
-    public static final String CONFIG_PROPERTY_DEFAULT_CODEC = "grails.views.default.codec";
+    public static final String PROLOG = "// Generated code, DO NOT EDIT!";
     private static final String CONFIG_PROPERTY_GSP_ENCODING = "grails.views.gsp.encoding";
     private static final String CONFIG_PROPERTY_GSP_KEEPGENERATED_DIR = "grails.views.gsp.keepgenerateddir";
 // not needed      private static final String CONFIG_PROPERTY_GSP_SITEMESH_PREPROCESS = "grails.views.gsp.sitemesh.preprocess";
@@ -301,8 +301,9 @@ public class GspTagParser extends GroovyPageParser {
         out = new GSPWriter(target, this);
         if (packageName != null && packageName.length() > 0) {
             out.println("package " + packageName);
-            out.println();
         }
+        out.println(PROLOG);
+        out.println();
         page();
         finalPass = true;
         scan.reset();
