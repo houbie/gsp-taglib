@@ -2,8 +2,8 @@ import org.codehaus.groovy.grails.web.pages.GspTagInfo
 import org.codehaus.groovy.grails.web.pages.GspTagParser
 
 class GspTaglibGrailsPlugin {
-    def version = "0.1"
-    def grailsVersion = "1.2.1 > *"
+    def version = "0.2"
+    def grailsVersion = "1.3.0 > *"
     def dependsOn = [:]
 
     def pluginExcludes = [
