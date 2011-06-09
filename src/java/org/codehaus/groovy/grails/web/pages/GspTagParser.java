@@ -133,6 +133,7 @@ public class GspTagParser extends GroovyPageParser {
     private String defaultCodecDirectiveValue;
     private String tagNamespace;
     private String tagComment;
+    private List<String> requiredAttrs = new ArrayList<String>();
 
     public String getContentType() {
         return contentType;
@@ -394,6 +395,9 @@ public class GspTagParser extends GroovyPageParser {
             if (name.equals(CONTENT_TYPE_DIRECTIVE)) {
                 contentType(value);
             }
+            if (name.equals("required")) {
+                requiredAttrs.add(value);
+            }
             if (name.equals(DEFAULT_CODEC_DIRECTIVE)) {
                 defaultCodecDirectiveValue = value.trim();
             }
@@ -618,6 +622,13 @@ public class GspTagParser extends GroovyPageParser {
                 out.println(tagComment);
             }
             out.println("def " + tagName + " = { attrs, body ->");
+
+            for (String required : requiredAttrs) {
+                String requiredAttributes[] = required.trim().split("\\s*,\\s*");
+                for (String attribute : requiredAttributes) {
+                    out.println("assert attrs." + attribute + ", \"missing required attribute " + attribute + "\"");
+                }
+            }
         }
 
         loop:

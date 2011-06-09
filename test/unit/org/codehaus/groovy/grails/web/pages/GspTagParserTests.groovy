@@ -179,4 +179,35 @@ out.print('</p>')
 }
 }''')
     }
+
+    void testParseRequired() {
+        String gsp = '''
+<%@ page required="name , firstName ,address\t,street" %>
+<%@ page required=" foo, " %>
+
+<p>${attrs.name}</p>'''
+        GspTagInfo tagInfo = new GspTagInfo('required', 'test.gspparser', gsp)
+        GroovyPageParser parser = new GspTagParser(tagInfo)
+        String parseResult = parser.parse().text
+        println parseResult
+        assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
+
+import org.codehaus.groovy.grails.web.taglib.*
+
+class _RequiredGspTagLib {
+def required = { attrs, body ->
+assert attrs.name, "missing required attribute name"
+assert attrs.firstName, "missing required attribute firstName"
+assert attrs.address, "missing required attribute address"
+assert attrs.street, "missing required attribute street"
+assert attrs.foo, "missing required attribute foo"
+out.print('\\n')
+out.print('\\n')
+out.print('\\n\\n<p>')
+out.print(attrs.name)
+out.print('</p>')
+}
+}''')
+    }
 }
