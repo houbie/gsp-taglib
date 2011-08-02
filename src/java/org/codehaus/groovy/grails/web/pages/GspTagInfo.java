@@ -21,22 +21,22 @@ public class GspTagInfo {
         this.tagName = tagName;
         this.packageName = packageName;
         tagLibName = "_" + Character.toUpperCase(tagName.charAt(0)) + tagName.substring(1) + "GspTagLib";
-        filePath = packageName.replace('.', '/') + '/' + getTagLibFileName();
+        filePath = packageName.replace('.', File.separatorChar) + File.separatorChar + getTagLibFileName();
         this.text = text;
     }
 
     public GspTagInfo(File file) {
         try {
             String path = file.getCanonicalPath();
-            if (path.indexOf("grails-app/taglib/") > -1) {
-                path = path.substring(path.indexOf("grails-app/taglib/") + 18);
+            if (path.indexOf("grails-app" + File.separatorChar + "taglib" + File.separatorChar) > -1) {
+                path = path.substring(path.indexOf("grails-app" + File.separatorChar + "taglib" + File.separatorChar) + 18);
             }
             if (path.lastIndexOf(".gsp") > -1) {
                 path = path.substring(0, path.lastIndexOf(".gsp"));
             }
-            int lastDot = path.lastIndexOf('/');
+            int lastDot = path.lastIndexOf(File.separatorChar);
             if (lastDot > -1) {
-                packageName = path.substring(0, lastDot).replace('/', '.');
+                packageName = path.substring(0, lastDot).replace(File.separatorChar, '.');
                 tagName = path.substring(lastDot + 1);
             } else {
                 packageName = "";
@@ -44,7 +44,7 @@ public class GspTagInfo {
             }
             tagLibName = "_" + Character.toUpperCase(tagName.charAt(0)) + tagName.substring(1) + "GspTagLib";
             text = read(file);
-            filePath = path + '/' + getTagLibFileName();
+            filePath = path + File.separatorChar + getTagLibFileName();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
