@@ -2,7 +2,7 @@ import org.codehaus.groovy.grails.web.pages.GspTagInfo
 import org.codehaus.groovy.grails.web.pages.GspTagParser
 
 class GspTaglibGrailsPlugin {
-    def version = "0.2.3"
+    def version = "0.3"
     def grailsVersion = "1.3.0 > *"
     def dependsOn = [:]
 
@@ -10,7 +10,6 @@ class GspTaglibGrailsPlugin {
             "grails-app/views/error.gsp"
     ]
 
-    // TODO Fill in these fields
     def author = "Ivo Houbrechts"
     def authorEmail = "ivo@houbrechts-it.be"
     def title = "GSP tags plugin"

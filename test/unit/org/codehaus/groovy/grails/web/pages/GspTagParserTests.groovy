@@ -36,6 +36,7 @@ out.print('<p>static content</p>')
         GspTagInfo tagInfo = new GspTagInfo('staticContentWithIncludesAndExpressions', 'test.gspparser', gsp)
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
+        println parseResult
         assertEquals(parseResult.trim(), '''package test.gspparser
 // Generated code, DO NOT EDIT!
 
@@ -70,6 +71,7 @@ ${bean}
         GspTagInfo tagInfo = new GspTagInfo('nestedTags', 'test.gspparser', gsp)
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
+        println parseResult
         assertEquals(parseResult.trim(), '''package test.gspparser
 // Generated code, DO NOT EDIT!
 
@@ -107,6 +109,7 @@ out.print('</div>\\n')
         GspTagInfo tagInfo = new GspTagInfo('quotesAndTags', 'test.gspparser', gsp)
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
+        println parseResult
         assertEquals(parseResult.trim(), '''package test.gspparser
 // Generated code, DO NOT EDIT!
 
@@ -135,6 +138,7 @@ out.print('\\n</p>\\n')
         GspTagInfo tagInfo = new GspTagInfo('namespaceTag', 'test.gspparser', gsp)
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
+        println parseResult
         assertEquals(parseResult.trim(), '''package test.gspparser
 // Generated code, DO NOT EDIT!
 
@@ -207,6 +211,102 @@ out.print('\\n')
 out.print('\\n\\n<p>')
 out.print(attrs.name)
 out.print('</p>')
+}
+}''')
+    }
+
+    void testParseMultipleBodies() {
+        String gsp = '''
+<g:outer name="outer">
+    <g:inner1 name="1">inner1</g:inner1>
+    <g:inner2 name="2">
+        <n:nested1 name="nested1"/>
+        <n:nested2 name="nested2">nested2</n:nested2>
+    </g:inner2>
+    <g:inner3 name="3">inner3</g:inner3>
+</g:outer>
+'''
+        GspTagInfo tagInfo = new GspTagInfo('nestedTags', 'test.gspparser', gsp)
+        GroovyPageParser parser = new GspTagParser(tagInfo)
+        String parseResult = parser.parse().text
+        println parseResult
+        assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
+
+import org.codehaus.groovy.grails.web.taglib.*
+
+class _NestedTagsGspTagLib {
+def nestedTags = { attrs, body ->
+out.print('\\n')
+def body1 = new GroovyPageTagBody(this,webRequest, {
+out.print('\\n    ')
+def body2 = 'inner1'
+out.print(g.inner1(['name':("1")] as GroovyPageAttributes,body2))
+out.print('\\n    ')
+body2 = new GroovyPageTagBody(this,webRequest, {
+out.print('\\n        ')
+out.print(n.nested1(['name':("nested1")] as GroovyPageAttributes,null))
+out.print('\\n        ')
+def body3 = 'nested2'
+out.print(n.nested2(['name':("nested2")] as GroovyPageAttributes,body3))
+out.print('\\n    ')
+})
+out.print(g.inner2(['name':("2")] as GroovyPageAttributes,body2))
+out.print('\\n    ')
+body2 = 'inner3'
+out.print(g.inner3(['name':("3")] as GroovyPageAttributes,body2))
+out.print('\\n')
+})
+out.print(g.outer(['name':("outer")] as GroovyPageAttributes,body1))
+out.print('\\n')
+}
+}''')
+    }
+
+    void testTagWithoutAttributes() {
+        String gsp = '''
+<g:outer>
+    <g:inner1>inner1</g:inner1>
+    <g:inner2 >
+        <n:nested1/>
+        <n:nested2 >nested2</n:nested2>
+    </g:inner2>
+    <g:inner3>inner3</g:inner3>
+</g:outer>
+'''
+        GspTagInfo tagInfo = new GspTagInfo('nestedTags', 'test.gspparser', gsp)
+        GroovyPageParser parser = new GspTagParser(tagInfo)
+        String parseResult = parser.parse().text
+        println parseResult
+        assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
+
+import org.codehaus.groovy.grails.web.taglib.*
+
+class _NestedTagsGspTagLib {
+def nestedTags = { attrs, body ->
+out.print('\\n')
+def body1 = new GroovyPageTagBody(this,webRequest, {
+out.print('\\n    ')
+def body2 = 'inner1'
+out.print(g.inner1([:],body2))
+out.print('\\n    ')
+body2 = new GroovyPageTagBody(this,webRequest, {
+out.print('\\n        ')
+out.print(n.nested1([:],null))
+out.print('\\n        ')
+def body3 = 'nested2'
+out.print(n.nested2([:],body3))
+out.print('\\n    ')
+})
+out.print(g.inner2([:],body2))
+out.print('\\n    ')
+body2 = 'inner3'
+out.print(g.inner3([:],body2))
+out.print('\\n')
+})
+out.print(g.outer([:],body1))
+out.print('\\n')
 }
 }''')
     }

@@ -812,10 +812,10 @@ public class GspTagParser extends GroovyPageParser {
 
             if (tm.bufferMode && tm.bufferPartNumber != -1) {
                 if (!bodyVarsDefined.contains(tm.tagIndex)) {
-                    //out.print("def ");
+                    out.print("def ");
                     bodyVarsDefined.add(tm.tagIndex);
                 }
-                out.print("def body" + tm.tagIndex + " = '" + escapeGroovy(htmlParts.get(tm.bufferPartNumber)));
+                out.print("body" + tm.tagIndex + " = '" + escapeGroovy(htmlParts.get(tm.bufferPartNumber)));
                 out.println("'");
                 bodyTagClosureName = "body" + tm.tagIndex;
                 tm.bufferMode = false;
@@ -834,7 +834,7 @@ public class GspTagParser extends GroovyPageParser {
                     out.println("out.print(" + ns + '.' + tagName + "(" + attrsVarsMapDefinition.get(tagIndex) +
                             "," + bodyTagClosureName + "))");
                 } else {
-                    out.println("out.print(" + ns + '.' + tagName + "(" + ",[:]," + bodyTagClosureName + "))");
+                    out.println("out.print(" + ns + '.' + tagName + "(" + "[:]," + bodyTagClosureName + "))");
                 }
             }
         }
@@ -966,10 +966,10 @@ public class GspTagParser extends GroovyPageParser {
         if (tm.bufferMode) {
             tm.bufferMode = false;
             if (!bodyVarsDefined.contains(tm.tagIndex)) {
-                //out.print("def ");
+                out.print("def ");
                 bodyVarsDefined.add(tm.tagIndex);
             }
-            out.println("def body" + tm.tagIndex + " = new GroovyPageTagBody(this,webRequest, {");
+            out.println("body" + tm.tagIndex + " = new GroovyPageTagBody(this,webRequest, {");
             closureLevel++;
         }
     }
