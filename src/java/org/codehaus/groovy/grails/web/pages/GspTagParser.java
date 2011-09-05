@@ -840,6 +840,13 @@ public class GspTagParser extends GroovyPageParser {
         }
 
         tm.bufferMode = false;
+        //remove all bodyVars with a higher nesting to force a "def " being printed if nesting is increased again
+        Iterator<Integer> iter = bodyVarsDefined.iterator();
+        while (iter.hasNext()){
+            if(iter.next() > tagIndex){
+                iter.remove();
+            }
+        }
         tagIndex--;
     }
 

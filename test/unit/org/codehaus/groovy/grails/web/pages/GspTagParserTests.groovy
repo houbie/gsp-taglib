@@ -217,16 +217,23 @@ out.print('</p>')
 
     void testParseMultipleBodies() {
         String gsp = '''
-<g:outer name="outer">
-    <g:inner1 name="1">inner1</g:inner1>
-    <g:inner2 name="2">
-        <n:nested1 name="nested1"/>
-        <n:nested2 name="nested2">nested2</n:nested2>
-    </g:inner2>
-    <g:inner3 name="3">inner3</g:inner3>
-</g:outer>
+<g:if test="${aTest}">
+    <g:outer1 name="outer1">
+        <g:inner1 name="1">inner1text</g:inner1>
+        <g:inner2 name="2">
+            <n:nested1 name="nested1"/>
+            <n:nested2 name="nested2">
+                <i:innerNested name="innerNested"/>
+            </n:nested2>
+        </g:inner2>
+        <g:inner3 name="3">inner3text</g:inner3>
+    </g:outer1>
+    <g:outer2 name="outer2">
+        <g:inner1 name="1">inner1text</g:inner1>
+    </g:outer2>
+</g:if>
 '''
-        GspTagInfo tagInfo = new GspTagInfo('nestedTags', 'test.gspparser', gsp)
+        GspTagInfo tagInfo = new GspTagInfo('multipleBodies', 'test.gspparser', gsp)
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
         println parseResult
@@ -235,29 +242,45 @@ out.print('</p>')
 
 import org.codehaus.groovy.grails.web.taglib.*
 
-class _NestedTagsGspTagLib {
-def nestedTags = { attrs, body ->
+class _MultipleBodiesGspTagLib {
+def multipleBodies = { attrs, body ->
 out.print('\\n')
-def body1 = new GroovyPageTagBody(this,webRequest, {
+if(true && (aTest)) {
 out.print('\\n    ')
-def body2 = 'inner1'
-out.print(g.inner1(['name':("1")] as GroovyPageAttributes,body2))
+def body2 = new GroovyPageTagBody(this,webRequest, {
+out.print('\\n        ')
+def body3 = 'inner1text'
+out.print(g.inner1(['name':("1")] as GroovyPageAttributes,body3))
+out.print('\\n        ')
+body3 = new GroovyPageTagBody(this,webRequest, {
+out.print('\\n            ')
+out.print(n.nested1(['name':("nested1")] as GroovyPageAttributes,null))
+out.print('\\n            ')
+def body4 = new GroovyPageTagBody(this,webRequest, {
+out.print('\\n                ')
+out.print(i.innerNested(['name':("innerNested")] as GroovyPageAttributes,null))
+out.print('\\n            ')
+})
+out.print(n.nested2(['name':("nested2")] as GroovyPageAttributes,body4))
+out.print('\\n        ')
+})
+out.print(g.inner2(['name':("2")] as GroovyPageAttributes,body3))
+out.print('\\n        ')
+body3 = 'inner3text'
+out.print(g.inner3(['name':("3")] as GroovyPageAttributes,body3))
+out.print('\\n    ')
+})
+out.print(g.outer1(['name':("outer1")] as GroovyPageAttributes,body2))
 out.print('\\n    ')
 body2 = new GroovyPageTagBody(this,webRequest, {
 out.print('\\n        ')
-out.print(n.nested1(['name':("nested1")] as GroovyPageAttributes,null))
-out.print('\\n        ')
-def body3 = 'nested2'
-out.print(n.nested2(['name':("nested2")] as GroovyPageAttributes,body3))
+def body3 = 'inner1text'
+out.print(g.inner1(['name':("1")] as GroovyPageAttributes,body3))
 out.print('\\n    ')
 })
-out.print(g.inner2(['name':("2")] as GroovyPageAttributes,body2))
-out.print('\\n    ')
-body2 = 'inner3'
-out.print(g.inner3(['name':("3")] as GroovyPageAttributes,body2))
+out.print(g.outer2(['name':("outer2")] as GroovyPageAttributes,body2))
 out.print('\\n')
-})
-out.print(g.outer(['name':("outer")] as GroovyPageAttributes,body1))
+}
 out.print('\\n')
 }
 }''')
@@ -274,7 +297,7 @@ out.print('\\n')
     <g:inner3>inner3</g:inner3>
 </g:outer>
 '''
-        GspTagInfo tagInfo = new GspTagInfo('nestedTags', 'test.gspparser', gsp)
+        GspTagInfo tagInfo = new GspTagInfo('noAttributes', 'test.gspparser', gsp)
         GroovyPageParser parser = new GspTagParser(tagInfo)
         String parseResult = parser.parse().text
         println parseResult
@@ -283,8 +306,8 @@ out.print('\\n')
 
 import org.codehaus.groovy.grails.web.taglib.*
 
-class _NestedTagsGspTagLib {
-def nestedTags = { attrs, body ->
+class _NoAttributesGspTagLib {
+def noAttributes = { attrs, body ->
 out.print('\\n')
 def body1 = new GroovyPageTagBody(this,webRequest, {
 out.print('\\n    ')
