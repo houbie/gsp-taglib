@@ -716,7 +716,7 @@ public class GspTagParser extends GroovyPageParser {
     private boolean shouldAddLineNumbers() {
         try {
             // for now, we support this through a system property.
-            String prop = System.getenv("GROOVY_PAGE_ADD_LINE_NUMBERS");
+            String prop = System.getenv("GROOVY_GSPTAGLIB_ADD_LINE_NUMBERS");
             return Boolean.valueOf(prop).booleanValue();
         } catch (Exception e) {
             // something wild happened
