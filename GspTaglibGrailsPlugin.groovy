@@ -2,12 +2,13 @@ import org.codehaus.groovy.grails.web.pages.GspTagInfo
 import org.codehaus.groovy.grails.web.pages.GspTagParser
 
 class GspTaglibGrailsPlugin {
-    def version = "0.3.2"
+    def version = "0.4"
     def grailsVersion = "1.3.0 > *"
     def dependsOn = [:]
 
     def pluginExcludes = [
-            "grails-app/views/error.gsp"
+            "grails-app/**",
+            "web-app/**"
     ]
 
     def author = "Ivo Houbrechts"
@@ -24,8 +25,10 @@ Grails plugin that makes it possible to define tags in GSP's in the grails-app/t
 
     def documentation = "http://grails-plugins.github.com/grails-release/"
 
-    def watchedResources = ["file:./plugins/*/grails-app/taglib/**/*.gsp",
-            "file:./grails-app/taglib/**/*.gsp"]
+    def watchedResources = [
+            "file:./plugins/*/grails-app/taglib/**/*.gsp",
+            "file:./grails-app/taglib/**/*.gsp"
+    ]
 
     def onChange = { event ->
         File gsp = event.source.file
