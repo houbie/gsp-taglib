@@ -23,6 +23,8 @@ import java.util.Stack;
  *  </g.threeColumn>
  *  }
  *  </pre>
+ *
+ *  @author Ivo Houbrechts
  */
 public class LayoutWriterStack {
     private static final String ATTRIBUTE_NAME_WRITER_STACK = "be.ixor.grails.gsptaglib.WRITER_STACK";
