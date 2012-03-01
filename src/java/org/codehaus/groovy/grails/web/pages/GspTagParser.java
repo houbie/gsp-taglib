@@ -22,7 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.filters.StringInputStream;
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 import org.codehaus.groovy.grails.plugins.GrailsPluginInfo;
 import org.codehaus.groovy.grails.plugins.GrailsPluginUtils;
 import org.codehaus.groovy.grails.web.taglib.GrailsTagRegistry;
@@ -138,6 +137,8 @@ public class GspTagParser extends GroovyPageParser {
     private String tagNamespace;
     private String tagDocs;
 
+    private File keepGeneratedDirectory;
+
     public String getContentType() {
         return contentType;
     }
@@ -180,26 +181,14 @@ public class GspTagParser extends GroovyPageParser {
         sourceName = tagInfo.getTagLibName() + ".gsp";
         packageName = tagInfo.getPackageName();
         tagName = tagInfo.getTagName();
-        Map config = ConfigurationHolder.getFlatConfig();
         GrailsPluginInfo info = pluginBuildSettings.getPluginInfoForSource(tagInfo.getFilePath());
         if (info != null) {
             pluginAnnotation = "@GrailsPlugin(name='" + info.getName() + "', version='" +
                     info.getVersion() + "')";
         }
 
-        // Get the GSP file encoding from Config, or fall back to system
-        // file.encoding if none set
-        Object gspEnc = config.get(CONFIG_PROPERTY_GSP_ENCODING);
-        if ((gspEnc != null) && (gspEnc.toString().trim().length() > 0)) {
-            gspEncoding = gspEnc.toString();
-        } else {
-            gspEncoding = System.getProperty("file.encoding", "us-ascii");
-        }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("GSP file encoding set to: " + gspEncoding);
-        }
-
+        gspEncoding = tagInfo.getGspEncoding();
         String gspSource = tagInfo.getText();
         scan = new GroovyPageScanner_(gspSource);
         environment = Environment.getCurrent();
@@ -223,6 +212,10 @@ public class GspTagParser extends GroovyPageParser {
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
+    }
+
+    public void setKeepGeneratedDirectory(File keepGeneratedDirectory) {
+        this.keepGeneratedDirectory = keepGeneratedDirectory;
     }
 
     public InputStream parse() {
@@ -274,14 +267,6 @@ public class GspTagParser extends GroovyPageParser {
     }
 
     private File resolveKeepGeneratedDirectory() {
-        File keepGeneratedDirectory = null;
-
-        Object keepDirObj = ConfigurationHolder.getFlatConfig().get(CONFIG_PROPERTY_GSP_KEEPGENERATED_DIR);
-        if (keepDirObj instanceof File) {
-            keepGeneratedDirectory = ((File) keepDirObj);
-        } else if (keepDirObj != null) {
-            keepGeneratedDirectory = new File(String.valueOf(keepDirObj));
-        }
         if (keepGeneratedDirectory != null && !keepGeneratedDirectory.isDirectory()) {
             LOG.warn("The directory specified with " + CONFIG_PROPERTY_GSP_KEEPGENERATED_DIR +
                     " config parameter doesn't exist or isn't a readable directory. Absolute path: '" +

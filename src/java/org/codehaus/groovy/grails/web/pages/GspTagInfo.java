@@ -1,21 +1,18 @@
 package org.codehaus.groovy.grails.web.pages;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
 
 public class GspTagInfo {
-    private static final String CONFIG_PROPERTY_GSP_ENCODING = "grails.views.gsp.encoding";
-
     private String text;
     private String tagName;
     private String tagLibName;
     private String packageName;
     private String filePath;
+    private String gspEncoding = "UTF-8";
 
     public GspTagInfo(String tagName, String packageName, String text) {
         this.tagName = tagName;
@@ -79,20 +76,18 @@ public class GspTagInfo {
     }
 
     private String read(File file) {
-        //TODO: inject config
-        Map config = ConfigurationHolder.getFlatConfig();
-        Object gspEnc = config.get(CONFIG_PROPERTY_GSP_ENCODING);
-        String gspEncoding;
-        if ((gspEnc != null) && (gspEnc.toString().trim().length() > 0)) {
-            gspEncoding = gspEnc.toString();
-        } else {
-            gspEncoding = System.getProperty("file.encoding", "us-ascii");
-        }
-
         try {
             return IOUtils.toString(new FileInputStream(file), gspEncoding);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getGspEncoding() {
+        return gspEncoding;
+    }
+
+    public void setGspEncoding(String gspEncoding) {
+        this.gspEncoding = gspEncoding;
     }
 }
