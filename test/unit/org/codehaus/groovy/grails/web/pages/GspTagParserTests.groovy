@@ -82,7 +82,7 @@ def nestedTags = { attrs, body ->
 out.print('\\n')
 if(true && (attrs.condition==true)) {
 out.print('\\n')
-attrs.beans.each { bean ->
+for( bean in attrs.beans ) {
 out.print('\\n')
 out.print(bean)
 out.print('\\n')
