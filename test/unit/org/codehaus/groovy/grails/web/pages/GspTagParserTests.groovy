@@ -157,10 +157,8 @@ out.print('</div>\\n')
 
     void testParseComment() {
         String gsp = '''
-<%--/**
-     *
-     * @attr name REQUIRED
-     */--%>
+<%@ page docs="
+@attr name REQUIRED" %>
 <p>${attrs.name}</p>'''
         GspTagInfo tagInfo = new GspTagInfo('staticContent', 'test.gspparser', gsp)
         GroovyPageParser parser = new GspTagParser(tagInfo)
@@ -173,11 +171,13 @@ import org.codehaus.groovy.grails.web.taglib.*
 
 class _StaticContentGspTagLib {
 /**
-     *
-     * @attr name REQUIRED
-     */
+ *\u0020
+ * @attr name REQUIRED
+ */
 def staticContent = { attrs, body ->
-out.print('\\n\\n<p>')
+assert attrs.name!= null, "Required tag attribute name may not be null"
+out.print('\\n')
+out.print('\\n<p>')
 out.print(attrs.name)
 out.print('</p>')
 }
@@ -186,8 +186,15 @@ out.print('</p>')
 
     void testParseRequired() {
         String gsp = '''
-<%@ page required="name , firstName ,address\t,street" %>
-<%@ page required=" foo, " %>
+<%@ page docs="
+@attr name Required
+@attr\tfirstName\trequired
+ @attr address REQUIRED
+@attr street Required
+
+@attr foo Required foobar
+
+" %>
 
 <p>${attrs.name}</p>'''
         GspTagInfo tagInfo = new GspTagInfo('required', 'test.gspparser', gsp)
@@ -200,13 +207,21 @@ out.print('</p>')
 import org.codehaus.groovy.grails.web.taglib.*
 
 class _RequiredGspTagLib {
+/**
+ *\u0020
+ * @attr name Required
+ * @attr\tfirstName\trequired
+ *  @attr address REQUIRED
+ * @attr street Required
+ *\u0020
+ * @attr foo Required foobar
+ */
 def required = { attrs, body ->
-assert attrs.name, "missing required attribute name"
-assert attrs.firstName, "missing required attribute firstName"
-assert attrs.address, "missing required attribute address"
-assert attrs.street, "missing required attribute street"
-assert attrs.foo, "missing required attribute foo"
-out.print('\\n')
+assert attrs.name!= null, "Required tag attribute name may not be null"
+assert attrs.firstName!= null, "Required tag attribute firstName may not be null"
+assert attrs.address!= null, "Required tag attribute address may not be null"
+assert attrs.street!= null, "Required tag attribute street may not be null"
+assert attrs.foo!= null, "Required tag attribute foo may not be null"
 out.print('\\n')
 out.print('\\n\\n<p>')
 out.print(attrs.name)

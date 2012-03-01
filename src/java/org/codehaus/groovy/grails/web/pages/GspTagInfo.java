@@ -79,6 +79,7 @@ public class GspTagInfo {
     }
 
     private String read(File file) {
+        //TODO: inject config
         Map config = ConfigurationHolder.getFlatConfig();
         Object gspEnc = config.get(CONFIG_PROPERTY_GSP_ENCODING);
         String gspEncoding;

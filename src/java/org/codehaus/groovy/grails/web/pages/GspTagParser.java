@@ -59,10 +59,13 @@ public class GspTagParser extends GroovyPageParser {
             "(\\s*(\\S+)\\s*=\\s*[\"]([^\"]*)[\"][\\s|>]{1}){1}");
     private static final Pattern PARSE_TAG_SECOND_PASS = Pattern.compile(
             "(\\s*(\\S+)\\s*=\\s*[']([^']*)['][\\s|>]{1}){1}");
+    private static final Pattern REQUIRED_ATTR_PATTERN = Pattern.compile(
+            "@attr\\s+(\\w+)\\s+REQUIRED", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern PAGE_DIRECTIVE_PATTERN = Pattern.compile(
             "(\\w+)\\s*=\\s*\"([^\"]*)\"");
-    private static final Pattern TAG_COMMENT__PATTERN = Pattern.compile("<%--(/\\*\\*.*?\\*/)--%>", Pattern.DOTALL);
+//
 
+    private boolean addRequiredAsserts = true;
     private GroovyPageScanner_ scan;
     private GSPWriter out;
     private String tagName;
@@ -118,6 +121,7 @@ public class GspTagParser extends GroovyPageParser {
     private static final String CONTENT_TYPE_DIRECTIVE = "contentType";
     private static final String DEFAULT_CODEC_DIRECTIVE = "defaultCodec";
     private static final String NAMESPACE_DIRECTIVE = "namespace";
+    private static final String DOCS_DIRECTIVE = "docs";
     // not needed   private static final String SITEMESH_PREPROCESS_DIRECTIVE = "sitemeshPreprocess";
     private static final String PAGE_DIRECTIVE = "page";
 
@@ -132,8 +136,7 @@ public class GspTagParser extends GroovyPageParser {
     private PluginBuildSettings pluginBuildSettings = GrailsPluginUtils.getPluginBuildSettings();
     private String defaultCodecDirectiveValue;
     private String tagNamespace;
-    private String tagComment;
-    private List<String> requiredAttrs = new ArrayList<String>();
+    private String tagDocs;
 
     public String getContentType() {
         return contentType;
@@ -200,10 +203,6 @@ public class GspTagParser extends GroovyPageParser {
         String gspSource = tagInfo.getText();
         scan = new GroovyPageScanner_(gspSource);
         environment = Environment.getCurrent();
-        Matcher m = TAG_COMMENT__PATTERN.matcher(gspSource);
-        if (m.find()) {
-            tagComment = m.group(1);
-        }
     }
 
     public int[] getLineNumberMatrix() {
@@ -395,8 +394,8 @@ public class GspTagParser extends GroovyPageParser {
             if (name.equals(CONTENT_TYPE_DIRECTIVE)) {
                 contentType(value);
             }
-            if (name.equals("required")) {
-                requiredAttrs.add(value);
+            if (name.equals(DOCS_DIRECTIVE)) {
+                tagDocs = value;
             }
             if (name.equals(DEFAULT_CODEC_DIRECTIVE)) {
                 defaultCodecDirectiveValue = value.trim();
@@ -618,15 +617,21 @@ public class GspTagParser extends GroovyPageParser {
                 out.print(tagNamespace);
                 out.println('"');
             }
-            if (tagComment != null) {
-                out.println(tagComment);
+            if (tagDocs != null) {
+                out.println("/**");
+                for (String line : tagDocs.split("\n")){
+                    out.print(" * ");
+                    out.println(line);
+                }
+                out.println(" */");
             }
             out.println("def " + tagName + " = { attrs, body ->");
 
-            for (String required : requiredAttrs) {
-                String requiredAttributes[] = required.trim().split("\\s*,\\s*");
-                for (String attribute : requiredAttributes) {
-                    out.println("assert attrs." + attribute + ", \"missing required attribute " + attribute + "\"");
+            if (addRequiredAsserts && tagDocs != null) {
+                Matcher m = REQUIRED_ATTR_PATTERN.matcher(tagDocs);
+                while (m.find()) {
+                    String attribute = m.group(1);
+                    out.println("assert attrs." + attribute + "!= null, \"Required tag attribute " + attribute + " may not be null\"");
                 }
             }
         }
@@ -1118,5 +1123,13 @@ public class GspTagParser extends GroovyPageParser {
 
     public String getDefaultCodecDirectiveValue() {
         return defaultCodecDirectiveValue;
+    }
+
+    public boolean isAddRequiredAsserts() {
+        return addRequiredAsserts;
+    }
+
+    public void setAddRequiredAsserts(boolean addRequiredAsserts) {
+        this.addRequiredAsserts = addRequiredAsserts;
     }
 }
