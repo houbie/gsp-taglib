@@ -79,7 +79,7 @@ Closure nestedTags = { attrs, body ->
 out.print('\\n')
 if(true && (attrs.condition==true)) {
 out.print('\\n')
-for( bean in attrs.beans ) {
+attrs.beans.each { bean ->
 out.print('\\n')
 out.print(bean)
 out.print('\\n')
@@ -172,7 +172,6 @@ class _StaticContentGspTagLib {
  * @attr name REQUIRED
  */
 Closure staticContent = { attrs, body ->
-assert attrs.name!= null, "Required tag attribute name may not be null"
 out.print('\\n')
 out.print('\\n<p>')
 out.print(attrs.name)
@@ -196,6 +195,7 @@ out.print('</p>')
 <p>${attrs.name}</p>'''
         GspTagInfo tagInfo = new GspTagInfo('required', 'test.gspparser', gsp)
         GroovyPageParser parser = new GspTagParser(tagInfo)
+        parser.setAddRequiredAsserts(true)
         String parseResult = parser.parse().text
         println parseResult
         assertEquals(parseResult.trim(), '''package test.gspparser

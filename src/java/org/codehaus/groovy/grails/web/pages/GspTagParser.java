@@ -66,7 +66,7 @@ public class GspTagParser extends GroovyPageParser {
             "<%\\s*@\\s*TagLibCodeBlock(.*?)%>", Pattern.DOTALL | Pattern.MULTILINE);
 
 
-    private boolean addRequiredAsserts = true;
+    private boolean addRequiredAsserts = false;
     private GroovyPageScanner_ scan;
     private GSPWriter out;
     private String tagName;

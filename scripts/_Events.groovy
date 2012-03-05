@@ -32,6 +32,9 @@ generateTagLibSource = {gsp, force = false ->
     if (force || !destination.exists() || destination.lastModified() < gsp.lastModified()) {
         println "generating taglib code for $gsp"
         def parser = createGspTagParser(tagInfo)
+        if (buildProps["gsptaglib.addRequiredAsserts"] != null) {
+            parser.addRequiredAsserts = buildProps["gsptaglib.addRequiredAsserts"]
+        }
         destination.text = parser.parse().text
         return true
     }
