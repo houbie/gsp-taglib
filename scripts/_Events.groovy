@@ -2,7 +2,20 @@ includeTargets << grailsScript("_GrailsCompile")
 
 def gspTagInfoClass
 def gspTagParserClass
+String generatedSrc = 'generated-sources'
+String generatedTagSrc = "$generatedSrc/grails-app/taglib"
+File genTagSrcDir = new File("$projectTargetDir/$generatedTagSrc")
 
+eventCleanStart = {
+    ant.delete(dir: "$projectTargetDir/$generatedSrc")
+}
+
+eventCompileStart = {
+    if (!projectCompiler.srcDirectories.find {it.endsWith(generatedTagSrc)}) {
+        genTagSrcDir.mkdirs()
+        projectCompiler.srcDirectories << genTagSrcDir.absolutePath
+    }
+}
 
 eventCompileEnd = {
     if (generateTagLibSources()) {
@@ -28,9 +41,11 @@ generateTagLibSources = {
 
 generateTagLibSource = {gsp, force = false ->
     def tagInfo = createGspTagInfo(gsp)
-    File destination = new File(gsp.parent, tagInfo.tagLibFileName)
+    File destinationDir = new File(genTagSrcDir, tagInfo.packageName.replace('.', '/'))
+    File destination = new File(destinationDir, tagInfo.tagLibFileName)
     if (force || !destination.exists() || destination.lastModified() < gsp.lastModified()) {
         println "generating taglib code for $gsp"
+        destinationDir.mkdirs()
         def parser = createGspTagParser(tagInfo)
         destination.text = parser.parse().text
         return true

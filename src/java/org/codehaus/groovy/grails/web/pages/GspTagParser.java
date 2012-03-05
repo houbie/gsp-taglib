@@ -610,7 +610,7 @@ public class GspTagParser extends GroovyPageParser {
                 }
                 out.println(" */");
             }
-            out.println("def " + tagName + " = { attrs, body ->");
+            out.println("Closure " + tagName + " = { attrs, body ->");
 
             if (addRequiredAsserts && tagDocs != null) {
                 Matcher m = REQUIRED_ATTR_PATTERN.matcher(tagDocs);
