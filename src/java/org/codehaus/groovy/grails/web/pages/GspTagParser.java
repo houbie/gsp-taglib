@@ -62,7 +62,9 @@ public class GspTagParser extends GroovyPageParser {
             "@attr\\s+(\\w+)\\s+REQUIRED", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern PAGE_DIRECTIVE_PATTERN = Pattern.compile(
             "(\\w+)\\s*=\\s*\"([^\"]*)\"");
-//
+    private static final Pattern CLASS_LEVEL_PATTERN = Pattern.compile(
+            "<%\\s*@\\s*TagLibCodeBlock(.*?)%>", Pattern.DOTALL | Pattern.MULTILINE);
+
 
     private boolean addRequiredAsserts = true;
     private GroovyPageScanner_ scan;
@@ -136,6 +138,7 @@ public class GspTagParser extends GroovyPageParser {
     private String defaultCodecDirectiveValue;
     private String tagNamespace;
     private String tagDocs;
+    private String classLevelCode = "";
 
     private File keepGeneratedDirectory;
 
@@ -189,7 +192,7 @@ public class GspTagParser extends GroovyPageParser {
 
 
         gspEncoding = tagInfo.getGspEncoding();
-        String gspSource = tagInfo.getText();
+        String gspSource = extractClassLevelCode(tagInfo.getText());
         scan = new GroovyPageScanner_(gspSource);
         environment = Environment.getCurrent();
     }
@@ -602,6 +605,11 @@ public class GspTagParser extends GroovyPageParser {
                 out.print(tagNamespace);
                 out.println('"');
             }
+            if(classLevelCode.length() > 0){
+                out.println();
+                out.print(classLevelCode);
+                out.println();
+            }
             if (tagDocs != null) {
                 out.println("/**");
                 for (String line : tagDocs.split("\n")){
@@ -610,7 +618,7 @@ public class GspTagParser extends GroovyPageParser {
                 }
                 out.println(" */");
             }
-            out.println("def " + tagName + " = { attrs, body ->");
+            out.println("Closure " + tagName + " = { attrs, body ->");
 
             if (addRequiredAsserts && tagDocs != null) {
                 Matcher m = REQUIRED_ATTR_PATTERN.matcher(tagDocs);
@@ -1084,6 +1092,16 @@ public class GspTagParser extends GroovyPageParser {
                 out.print(c);
             }
         }
+    }
+
+    private String extractClassLevelCode(String text) {
+        Matcher m = CLASS_LEVEL_PATTERN.matcher(text);
+        StringBuilder sb = new StringBuilder();
+        while (m.find()) {
+            sb.append(m.group(1)).append('\n');
+        }
+        classLevelCode = sb.toString();
+        return m.replaceAll("");
     }
 
     public long getLastModified() {

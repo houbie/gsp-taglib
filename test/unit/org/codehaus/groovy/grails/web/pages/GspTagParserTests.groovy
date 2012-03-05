@@ -1,9 +1,6 @@
 package org.codehaus.groovy.grails.web.pages
 
 class GspTagParserTests extends GroovyTestCase {
-    static final testResourcesDir = new File('./test/unit/org/codehaus/groovy/grails/web/pages')
-
-
 
     void testParseStaticContent() {
         String gsp = '<p>static content</p>'
@@ -18,7 +15,7 @@ class GspTagParserTests extends GroovyTestCase {
 import org.codehaus.groovy.grails.web.taglib.*
 
 class _StaticContentGspTagLib {
-def staticContent = { attrs, body ->
+Closure staticContent = { attrs, body ->
 out.print('<p>static content</p>')
 }
 }''')
@@ -45,7 +42,7 @@ import java.lang.String
 import org.codehaus.groovy.grails.web.taglib.*
 
 class _StaticContentWithIncludesAndExpressionsGspTagLib {
-def staticContentWithIncludesAndExpressions = { attrs, body ->
+Closure staticContentWithIncludesAndExpressions = { attrs, body ->
 out.print('\\n')
 out.print('\\n')
 out.print('\\n\\n<p>')
@@ -78,7 +75,7 @@ ${bean}
 import org.codehaus.groovy.grails.web.taglib.*
 
 class _NestedTagsGspTagLib {
-def nestedTags = { attrs, body ->
+Closure nestedTags = { attrs, body ->
 out.print('\\n')
 if(true && (attrs.condition==true)) {
 out.print('\\n')
@@ -116,7 +113,7 @@ out.print('</div>\\n')
 import org.codehaus.groovy.grails.web.taglib.*
 
 class _QuotesAndTagsGspTagLib {
-def quotesAndTags = { attrs, body ->
+Closure quotesAndTags = { attrs, body ->
 out.print('\\n<p class="para">\\n    ')
 def body1 = new GroovyPageTagBody(this,webRequest, {
 out.print('\\n       ')
@@ -146,7 +143,7 @@ import org.codehaus.groovy.grails.web.taglib.*
 
 class _NamespaceTagGspTagLib {
 static namespace = "ns"
-def namespaceTag = { attrs, body ->
+Closure namespaceTag = { attrs, body ->
 out.print('\\n')
 out.print('\\n<div>')
 out.print(body())
@@ -174,7 +171,7 @@ class _StaticContentGspTagLib {
  *\u0020
  * @attr name REQUIRED
  */
-def staticContent = { attrs, body ->
+Closure staticContent = { attrs, body ->
 assert attrs.name!= null, "Required tag attribute name may not be null"
 out.print('\\n')
 out.print('\\n<p>')
@@ -216,7 +213,7 @@ class _RequiredGspTagLib {
  *\u0020
  * @attr foo Required foobar
  */
-def required = { attrs, body ->
+Closure required = { attrs, body ->
 assert attrs.name!= null, "Required tag attribute name may not be null"
 assert attrs.firstName!= null, "Required tag attribute firstName may not be null"
 assert attrs.address!= null, "Required tag attribute address may not be null"
@@ -258,7 +255,7 @@ out.print('</p>')
 import org.codehaus.groovy.grails.web.taglib.*
 
 class _MultipleBodiesGspTagLib {
-def multipleBodies = { attrs, body ->
+Closure multipleBodies = { attrs, body ->
 out.print('\\n')
 if(true && (aTest)) {
 out.print('\\n    ')
@@ -322,7 +319,7 @@ out.print('\\n')
 import org.codehaus.groovy.grails.web.taglib.*
 
 class _NoAttributesGspTagLib {
-def noAttributes = { attrs, body ->
+Closure noAttributes = { attrs, body ->
 out.print('\\n')
 def body1 = new GroovyPageTagBody(this,webRequest, {
 out.print('\\n    ')
@@ -345,6 +342,40 @@ out.print('\\n')
 })
 out.print(g.outer([:],body1))
 out.print('\\n')
+}
+}''')
+    }
+
+
+    void testClassLevelCode() {
+        String gsp = '''
+<%
+ @ TagLibCodeBlock
+    MyService myService
+    int anInt
+%>
+<p>static content</p>
+<% @TagLibCodeBlock otherCode()%>
+'''
+        GspTagInfo tagInfo = new GspTagInfo('classLevel', 'test.gspparser', gsp)
+        GroovyPageParser parser = new GspTagParser(tagInfo)
+        String parseResult = parser.parse().text
+        println parseResult
+        assertEquals(parseResult.trim(), '''package test.gspparser
+// Generated code, DO NOT EDIT!
+
+import org.codehaus.groovy.grails.web.taglib.*
+
+class _ClassLevelGspTagLib {
+
+
+    MyService myService
+    int anInt
+
+ otherCode()
+
+Closure classLevel = { attrs, body ->
+out.print('\\n\\n<p>static content</p>\\n\\n')
 }
 }''')
     }
