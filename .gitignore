@@ -6,3 +6,4 @@ out
 *.db
 *.zip
 plugin.xml
+*GspTagLib.groovy
